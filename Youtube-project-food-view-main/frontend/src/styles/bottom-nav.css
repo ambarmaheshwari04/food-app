@@ -1,0 +1,121 @@
+/* ==========================================================================
+   Project: Gemini Food Reel App
+   File: frontend/src/styles/bottom-nav.css
+   Description: Premium Cyberpunk Golden Amber Responsive Bottom Navigation
+   ========================================================================== */
+
+@import './theme.css';
+
+:root {
+  /* High-end classic golden amber variant optimized for dark mode clarity */
+  --nav-amber-brand: #f59e0b;
+  --nav-amber-glow: 0 0 15px rgba(245, 158, 11, 0.5);
+  --nav-smooth-transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bottom-nav {
+  position: fixed;
+  left: 0; 
+  right: 0; 
+  bottom: 0;
+  height: 56px;
+  /* Translucent pure black glassmorphism layout */
+  background: color-mix(in srgb, #000000 50%, transparent);
+  backdrop-filter: blur(5px);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: var(--shadow-md);
+  border-top: 1px solid var(--color-border);
+  z-index: 50;
+}
+
+.bottom-nav__inner {
+  max-width: 680px;
+  margin: 0 auto;
+  height: 100%;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr); 
+  align-items: center;
+  box-sizing: border-box;
+  padding: 0 10px;
+}
+
+.bottom-nav__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  gap: 2px;
+  height: 100%;
+  position: relative;
+  transition: var(--nav-smooth-transition);
+  cursor: pointer;
+}
+
+/* Floating warm amber underline for active selection */
+.bottom-nav__item::before {
+  content: '';
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  transform: translateX(-50%) scaleX(0);
+  width: 20px;
+  height: 2px;
+  background-color: var(--nav-amber-brand);
+  border-radius: 4px;
+  transition: var(--nav-smooth-transition);
+  box-shadow: var(--nav-amber-glow);
+}
+
+.bottom-nav__item.is-active::before {
+  transform: translateX(-50%) scaleX(1);
+}
+
+/* Clean vertical translation lift on interactive hover states */
+@media (hover: hover) {
+  .bottom-nav__item:hover {
+    color: var(--nav-amber-brand) !important;
+    transform: translateY(-2px);
+  }
+}
+
+/* Micro-interaction scale reduction upon active click */
+.bottom-nav__item:active {
+  transform: translateY(0) scale(0.95);
+}
+
+.bottom-nav__icon { 
+  line-height: 0; 
+  transition: var(--nav-smooth-transition);
+}
+
+/* Subtle micro-bounce scaling on active navigation cursor */
+.bottom-nav__item:hover .bottom-nav__icon {
+  transform: scale(1.06);
+}
+
+.bottom-nav__label { 
+  font-size: 11px; 
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  transition: var(--nav-smooth-transition);
+}
+
+/* Active navigation state featuring premium rich text shadow and neon contrast */
+.bottom-nav__item.is-active { 
+  color: var(--nav-amber-brand) !important; 
+  font-weight: 600;
+  text-shadow: 0 0 8px rgba(245, 158, 11, 0.35);
+}
+
+.bottom-nav__item.is-active .bottom-nav__icon {
+  transform: scale(1.1);
+  filter: drop-shadow(var(--nav-amber-glow));
+}
+
+/* Layout support constraints safeguarding iOS native overlay areas */
+@supports(padding: max(0px)) {
+  .bottom-nav { padding-bottom: max(env(safe-area-inset-bottom), 0px); }
+}

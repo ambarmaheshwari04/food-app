@@ -1,0 +1,28 @@
+/* Add this to your main CSS file for the reels page */
+.reels-page {
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    background-color: #000;
+}
+
+.reels-feed {
+    height: 100vh;
+    width: 100%;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory; /* This gives you that smooth "Instagram" scroll */
+}
+
+.reel {
+    scroll-snap-align: start;
+    height: 100vh;
+    width: 100%;
+    position: relative;
+}
+
+/* Ensure the video doesn't break out of the container */
+.reel-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
