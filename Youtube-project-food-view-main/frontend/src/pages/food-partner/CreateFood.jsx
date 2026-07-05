@@ -72,7 +72,7 @@ const CreateFood = () => {
         formData.append('price', price);
 
         try {
-            const response = await axios.post("http://localhost:3000/api/food", formData, {
+            const response = await axios.post("https://food-app-backend-rnwb.onrender.com/api/food", formData, {
                 withCredentials: true,
             });
             console.log(response.data);
