@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'react-router-dom';
 import axios from 'axios';
 import { AppContext } from '../routes/AppRoutes';
 import { toast } from 'react-toastify';
@@ -75,7 +76,6 @@ const ReelFeed = ({ items: initialItems = [], emptyMessage = 'No videos yet.', i
     setActiveIcon({ id: itemId, type: nextMuteState ? 'muted' : 'unmuted' });
     setTimeout(() => { setActiveIcon({ id: null, type: '' }); }, 800);
   };
-
   const handleLikeClick = async (item) => {
     const reelId = item._id;
     const isCurrentlyLiked = !!likedReels[reelId];
@@ -87,7 +87,7 @@ const ReelFeed = ({ items: initialItems = [], emptyMessage = 'No videos yet.', i
         : v
     ));
 
-    try { await axios.post(`http://localhost:3000/api/food/like`, { foodId: reelId }, { withCredentials: true }); }
+    try { await axios.post(`https://onrender.com`, { foodId: reelId }, { withCredentials: true }); }
     catch (err) { console.error("Like action failed:", err); }
   };
 
@@ -113,7 +113,7 @@ const ReelFeed = ({ items: initialItems = [], emptyMessage = 'No videos yet.', i
     }));
 
     try {
-        await axios.post(`http://localhost:3000/api/food/save`, { foodId: reelId }, { withCredentials: true });
+        await axios.post(`https://onrender.com`, { foodId: reelId }, { withCredentials: true });
     } catch (err) {
         console.error("Save action failed:", err);
     }
@@ -134,13 +134,12 @@ const ReelFeed = ({ items: initialItems = [], emptyMessage = 'No videos yet.', i
     setReelComments(prev => ({ ...prev, [reelId]: [...(prev[reelId] || []), newCommentObj] }));
     setNewCommentText('');
 
-    try { await axios.post(`http://localhost:3000/api/reels/${reelId}/comment`, { text: commentText }); }
+    try { await axios.post(`https://onrender.com{reelId}/comment`, { text: commentText }); }
     catch (err) { console.error(err); }
   };
 
   const cleanText = (text) => { if (!text) return ''; return text.replace(/\*\*/g, ''); };
 
-  // Deterministic per-item nutrition fallback (stable across re-renders, unlike Math.random())
   const getNutritionInfo = (item) => {
     if (item.nutrition) return item.nutrition;
     const seed = (item._id || '').toString().split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
@@ -158,7 +157,7 @@ const ReelFeed = ({ items: initialItems = [], emptyMessage = 'No videos yet.', i
     const lowerName = cleanDishName.toLowerCase();
     try {
       setSelectedRecipe({ title: `✨ Chef AI: ${cleanDishName}`, description: "Connecting directly to Gemini AI Server...", ingredients: ["Fetching authentic real-time data..."], steps: ["Please wait..."] });
-      const response = await axios.post('http://localhost:3000/api/extract-recipe', { dishName: currentDishName });
+      const response = await axios.post('https://onrender.com', { dishName: currentDishName });
       if (response.data) setSelectedRecipe(response.data);
     } catch (err) {
       const isSweet = lowerName.includes('waffle') || lowerName.includes('cake') || lowerName.includes('sweet');
@@ -175,7 +174,7 @@ const ReelFeed = ({ items: initialItems = [], emptyMessage = 'No videos yet.', i
     const confirmDelete = window.confirm("Are you sure you want to permanently delete this reel?");
     if (!confirmDelete) return;
     try {
-      const response = await axios.delete(`http://localhost:3000/api/food/${activeManageReelId}`, { withCredentials: true });
+      const response = await axios.delete(`https://onrender.com{activeManageReelId}`, { withCredentials: true });
       if (response.status === 200 || response.data.success) {
         setItems(prevVideos => prevVideos.filter(video => (video._id || video.id) !== activeManageReelId));
         toast.success("Reel deleted successfully.");
@@ -195,7 +194,6 @@ const ReelFeed = ({ items: initialItems = [], emptyMessage = 'No videos yet.', i
     setActiveOrders(prevOrders => [...prevOrders, item]);
     toast.success(`⚡ Direct Order Placed for ${item.name || item.title || "Dish"}! Check active orders.`, { position: 'top-center' });
   };
-
   if (isGridMode && !expandedGridItem) {
     return (
       <div className="grid-scroll" style={{ width: '100%', height: 'calc(100vh - 65px)', backgroundColor: '#000', overflowY: 'auto' }}>
@@ -218,7 +216,6 @@ const ReelFeed = ({ items: initialItems = [], emptyMessage = 'No videos yet.', i
         `}</style>
         <div className="grid-wrap">
           {items.length === 0 && <div style={{ color: '#fff', padding: '20px', gridColumn: '1 / -1', textAlign: 'center' }}>{emptyMessage}</div>}
-
           {items.map((item, idx) => {
             const totalLikes = item.likeCount || item.likes || 0;
             const totalComments = (item.commentsCount || 0) + (reelComments[item._id] || []).length;
@@ -260,10 +257,9 @@ const ReelFeed = ({ items: initialItems = [], emptyMessage = 'No videos yet.', i
           onClick={() => setExpandedGridItem(null)}
           style={{ position: 'absolute', top: '20px', left: '20px', zIndex: 9999, background: 'rgba(0,0,0,0.6)', border: 'none', borderRadius: '50%', width: '40px', height: '40px', color: '#fff', fontSize: '24px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(5px)' }}
         >
-          &#8592;
+          ←
         </button>
       )}
-
       <style>{`
         .reels-page { background: radial-gradient(120% 100% at 50% 0%, #1c1006 0%, #0a0705 45%, #000 78%); }
         .reels-feed::-webkit-scrollbar { display: none; }
@@ -305,7 +301,6 @@ const ReelFeed = ({ items: initialItems = [], emptyMessage = 'No videos yet.', i
         @keyframes modalPop { from { opacity: 0; transform: scale(0.94) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
         @media (prefers-reduced-motion: reduce) { .cta-btn, .action-btn, .comment-sheet, .recipe-modal-backdrop, .recipe-modal-card, .nutrition-icon-btn, .nutrition-popup { transition: none !important; animation: none !important; } }
       `}</style>
-
       <div className="reels-feed" role="list" style={{ width: '100%', height: '100%', overflowY: 'scroll', scrollSnapType: 'y mandatory', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         {displayItems.length === 0 && ( <div className="empty-state" style={{ color: '#fff', marginTop: '50px' }}><p>{emptyMessage}</p></div> )}
 
@@ -350,9 +345,7 @@ const ReelFeed = ({ items: initialItems = [], emptyMessage = 'No videos yet.', i
                       className={`nutrition-icon-btn${activeNutritionReelId === item._id ? ' is-open' : ''}`}
                       type="button"
                       aria-label="View nutrition info"
-                    >
-                      🔥
-                    </button>
+                    >🔥</button>
 
                     {activeNutritionReelId === item._id && (() => {
                       const n = getNutritionInfo(item);
@@ -367,7 +360,6 @@ const ReelFeed = ({ items: initialItems = [], emptyMessage = 'No videos yet.', i
                       );
                     })()}
                   </div>
-
                   <div className="reel-actions">
                     <div className="reel-action-group"><button onClick={() => handleLikeClick(item)} className={`action-btn${isLikedByMe ? ' is-liked' : ''}`} type="button"><svg width="21" height="21" viewBox="0 0 24 24" fill={isLikedByMe ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 22l7.8-8.6 1-1a5.5 5.5 0 0 0 0-7.8z" /></svg></button><div className="action-count">{totalLikes}</div></div>
                     <div className="reel-action-group"><button onClick={() => handleCommentClick(item._id)} className="action-btn" type="button"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z" /></svg></button><div className="action-count">{totalComments}</div></div>
@@ -376,39 +368,27 @@ const ReelFeed = ({ items: initialItems = [], emptyMessage = 'No videos yet.', i
 
                   <div className="reel-content" style={{ position: 'absolute', bottom: '24px', left: '16px', right: '76px', display: 'flex', flexDirection: 'column', pointerEvents: 'auto', zIndex: 999 }}>
 
-                    {/* {partnerName && <div className="reel-byline">{partnerName}</div>}
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', flexWrap: 'wrap', marginBottom: '6px' }}>
-                      <h2 className="reel-title">{displayName}</h2>
-                      {item.price != null && <span className="price-tag">₹{item.price}</span>}
-                    </div>
-                    {(item.description || item.title) && <p className="reel-desc">{item.description || item.title}</p>} */}
-
-
-
                     {partnerName && <div className="reel-byline">{partnerName}</div>}
 
-{/* --- NEW: Title with Compact Price Tag --- */}
-<div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '6px', flexWrap: 'wrap' }}>
-  <h2 className="reel-title" style={{ margin: 0 }}>{displayName}</h2>
-  
-  {/* Price Badge (Minimal Space) */}
-  <span style={{ 
-    background: 'rgba(16, 185, 129, 0.15)', 
-    border: '1px solid rgba(16, 185, 129, 0.4)', 
-    color: '#34d399', 
-    padding: '4px 10px', 
-    borderRadius: '10px', 
-    fontSize: '14px', 
-    fontWeight: '800', 
-    backdropFilter: 'blur(4px)',
-    letterSpacing: '0.5px'
-  }}>
-    ₹{item.price }
-  </span>
-</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '6px', flexWrap: 'wrap' }}>
+                      <h2 className="reel-title" style={{ margin: 0 }}>{displayName}</h2>
+                      
+                      <span style={{ 
+                        background: 'rgba(16, 185, 129, 0.15)', 
+                        border: '1px solid rgba(16, 185, 129, 0.4)', 
+                        color: '#34d399', 
+                        padding: '4px 10px', 
+                        borderRadius: '10px', 
+                        fontSize: '14px', 
+                        fontWeight: '800', 
+                        backdropFilter: 'blur(4px)',
+                        letterSpacing: '0.5px'
+                      }}>
+                        ₹{item.price}
+                      </span>
+                    </div>
 
-{(item.description || item.title) && <p className="reel-desc">{item.description || item.title}</p>}
-
+                    {(item.description || item.title) && <p className="reel-desc">{item.description || item.title}</p>}
                     <div className="cta-row" style={{ marginBottom: '10px' }}>
                       <button onClick={() => handleExtractRecipe(item)} className="cta-btn cta-recipe" type="button"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 2v7a2 2 0 0 0 2 2 2 2 0 0 0 2-2V2" /><path d="M5 11v11" /><path d="M19 2c-1.7 0-3 2-3 5v3a2 2 0 0 0 2 2h1v10" /></svg> View Recipe </button>
                       {item.foodPartner && ( <Link to={"/food-partner/" + (item.foodPartner._id || item.foodPartner)} className="cta-btn cta-store"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l1-5h16l1 5" /><path d="M5 9v10h14V9" /><path d="M9 19v-6h6v6" /></svg> Visit Store </Link> )}
