@@ -9,7 +9,7 @@ const Home = () => {
     useEffect(() => {
         const fetchVideos = async () => {
             try {
-                const response = await axios.get('http://localhost:3000/api/food', { withCredentials: true });
+                const response = await axios.get('https://food-app-backend-rnwb.onrender.com/api/food', { withCredentials: true });
                 
                 // 💡 The exact same extraction logic that worked on your Search page!
                 const foodsArray = Array.isArray(response.data) 
